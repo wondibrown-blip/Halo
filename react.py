@@ -1,11 +1,11 @@
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from pyrogram.raw import functions
 
-#configuration 
+# ==================== CONFIGURATION ====================
 API_ID = 32500857            
 API_HASH = "777a8c5d7b009d027a2d3b64b67652f1"  
+# =======================================================
 
 app = Client("my_userbot", api_id=API_ID, api_hash=API_HASH)
 
@@ -16,69 +16,54 @@ async def get_reaction_list(client: Client, message: Message):
         return
 
     target_msg = message.reply_to_message
-    chat_peer = await client.resolve_peer(message.chat.id)
     
+    try:
+        # Ambil ulang pesan terbaru agar sinkron dengan server Railway
+        updated_msg = await client.get_messages(chat_id=message.chat.id, message_ids=target_msg.id)
+    except Exception as e:
+        await message.reply_text(f"Gagal sinkronisasi pesan: {str(e)}")
+        return
+
+    msg_reactions = updated_msg.reactions
+    
+    if not msg_reactions or not msg_reactions.reactions:
+        await message.reply_text("Gak ada.")
+        return
+
     user_list = []
     total_react_count = 0
 
-    try:
-        # ambil raw tele
-        reaction_list_raw = await client.invoke(
-            functions.messages.GetMessageReactionsList(
-                peer=chat_peer,
-                id=target_msg.id,
-                limit=100
-            )
-        )
+    # Ekstrak data reaksi secara hybrid (kompatibel penuh dengan Railway cloud)
+    for react in msg_reactions.reactions:
+        total_react_count += react.count
         
-        if hasattr(reaction_list_raw, "users"):
-            for raw_user in reaction_list_raw.users:
-                username = None
+        # Ambil peers pemberi reaksi
+        peers = getattr(react, "added_reactions", None) or getattr(react, "recent_peers", None)
+        
+        if peers:
+            for added in peers:
+                user_obj = getattr(added, "user", added)
+                user_id = getattr(user_obj, "id", None)
                 
-                # cek usn
-                if getattr(raw_user, "username", None):
-                    username = raw_user.username
-                
-                # multi usn
-                elif getattr(raw_user, "usernames", None):
-                    for u in raw_user.usernames:
-                        if getattr(u, "editable", False) or getattr(u, "active", False):
-                            username = u.username
-                            break
-                
-                # berhasil
-                if username:
-                    user_list.append(f"@{username}")
-                else:
-                    # kalau gagal
+                if user_id:
                     try:
-                        user_id = getattr(raw_user, "id", None)
-                        if user_id:
-                            fetched_user = await client.get_users(user_id)
-                            if fetched_user.username:
-                                user_list.append(f"@{fetched_user.username}")
+                        # Paksa ambil data profil terupdate langsung dari data ID
+                        user_info = await client.get_users(user_id)
+                        if user_info.username:
+                            user_list.append(f"@{user_info.username}")
                     except Exception:
                         pass
 
-        # Hitung jumlah total reaksi
-        updated_msg = await client.get_messages(chat_id=message.chat.id, message_ids=target_msg.id)
-        if updated_msg.reactions and updated_msg.reactions.reactions:
-            for r in updated_msg.reactions.reactions:
-                total_react_count += r.count
-
-    except Exception as e:
-        await message.reply_text(f"Bntr ada yang salah: {str(e)}")
-        return
-
+    # Bersihkan duplikasi data usn
     user_list = list(set(user_list))
 
     if not user_list:
-        await message.reply_text("Gagal, adminin dulu gw di gc.")
+        await message.reply_text("Gagal, adminin dulu gw di gc")
         return
 
     usernames_string = " ".join(user_list)
 
-    # PERBAIKAN: Ditambahkan f-string dan dibungkus backtick agar font menjadi monospace (mono)
+    # Format text monospace (mono)
     caption_template = f"`{usernames_string} ({total_react_count})`"
 
     await client.send_message(
@@ -87,5 +72,5 @@ async def get_reaction_list(client: Client, message: Message):
         disable_web_page_preview=False
     )
 
-print("⚡ Userbot /done v5 (Mono Format) Aktif!")
+print("⚡ Userbot /done v6 (Cloud Native) Aktif!")
 app.run()
