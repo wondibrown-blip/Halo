@@ -84,7 +84,7 @@ async def get_reaction_list(client: Client, message: Message):
         usernames_string = " ".join(user_list)
 
     # Template Estetik SYNC PACT
-    caption_template = (f"`{usernames_string} ({total_react_count})`) 
+    caption_template = f"`{usernames_string} ({total_react_count})`"
     
     await message.reply_text(
         text=caption_template,
