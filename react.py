@@ -7,10 +7,10 @@ from pyrogram.raw.types import InputPeerChannel, InputPeerChat
 # ==================== CONFIGURATION ====================
 API_ID = 32500857            
 API_HASH = "777a8c5d7b009d027a2d3b64b67652f1"  
-SESSION_STRING = "BQHv7HkAmmJiShBDImxMhhjJO6AFjP5-O4tTzj1_zus1kOTL2c7X8nLw64HbtK74jYfDDZZQIcumSQTwSFGp_0dKUDfQmJM0ei54OTX5BmJqrV3zVWsAI533vuEWKVzjtfiPrBhcwO9WDusWSqpkEanOOFImsOGN7-wDPBMK6BDubW6ENwoztQNNP08QdrtYc0LxgXy4J3wzIhoLsA-AxaOSA-dwmTZw9X2tfbx9EJeS_eraPvwjI8Ia5ly9k_mus0QnnPbeTzRfnLtqPxwP1RqHANj8FlFheTuR33stcMudAZVK-dzaGPUQ4EIWdzHb5zVPVKC__04cB6zlujEHRcHbftN-dAAAAAH62YR3AA"
-# =======================================================
+SESSION_STRING = "BQHv7HkAsZfViv2vvFXCdFiVqWpgnF2RbHfcVUfqMjA8juxQ9PeyDWVYLxNeHXjXbYKuf1eEr75SQaaRxG8u-6vlmIatHqCnnynNaWfTUPyaybJCFlHWuqIqp8H34MpUXihZ2JUkE1cq6jQZbtuC9rAokLM1bUzAxMFemOuMlK2EzfBFxjDMJ2k0LhXomh3KX8lMwvvZ3_BhD1sJNm1D3qtOdnNV6vtHGgbqz6rMX5Byw78-Tlx6jze4B44feumk9dteuZTVnxx2VvhsEzkvVQrmUw56Z-rJbGUaV3oioYTic4g9XYUx3xIg1-6tNTXnXQ42_HxB9TO34QB60ZwyBYFQCmDsPgAAAAH62YR3AA"
 
-app = Client("my_userbot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
+
+app = Client("my_userbot10", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
 @app.on_message(filters.command("done", prefixes=["/", "."]) & filters.group)
 async def get_reaction_list(client: Client, message: Message):
@@ -79,7 +79,7 @@ async def get_reaction_list(client: Client, message: Message):
     user_list = list(set(user_list))
 
     if not user_list:
-        usernames_string = "Gk ada"
+        usernames_string = "No-Users-Detected"
     else:
         usernames_string = " ".join(user_list)
 
