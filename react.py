@@ -7,9 +7,9 @@ from pyrogram.raw.types import InputPeerChannel, InputPeerChat
 # ==================== CONFIGURATION ====================
 API_ID = 32500857         
 API_HASH = "777a8c5d7b009d027a2d3b64b67652f1"  
-SESSION_STRING = "BQHv7HkAsZfViv2vvFXCdFiVqWpgnF2RbHfcVUfqMjA8juxQ9PeyDWVYLxNeHXjXbYKuf1eEr75SQaaRxG8u-6vlmIatHqCnnynNaWfTUPyaybJCFlHWuqIqp8H34MpUXihZ2JUkE1cq6jQZbtuC9rAokLM1bUzAxMFemOuMlK2EzfBFxjDMJ2k0LhXomh3KX8lMwvvZ3_BhD1sJNm1D3qtOdnNV6vtHGgbqz6rMX5Byw78-Tlx6jze4B44feumk9dteuZTVnxx2VvhsEzkvVQrmUw56Z-rJbGUaV3oioYTic4g9XYUx3xIg1-6tNTXnXQ42_HxB9TO34QB60ZwyBYFQCmDsPgAAAAH62YR3AA"
+SESSION_STRING = "BQHv7HkABfcNqruKJmIqHXxLaI_b5OXfnjp6xLx43mZXc9Jc-0f_oVCEAL5_xIzHrfP1dx-EQhu3vVWeVwKJhOeAZKOMHz1YRmub0HNTyfwKP034CMZjdGgmtQrVDS_bXLGv5JqARuXlpu2Tpx1UX-qNxtHY1WXU1pCzpKhQNxrWeyEwSKRNbdwfr7APjpZvwv058cS7sVJGbhhp5HHQXjoGE67Y6LuElYtRMg4Je28m3rkj2rHReVtZ1L1pso5kH7ZJoCq6MEFZxxxzMs_W0OUktEEBXP_NXy356DPxYf8yPEYjGH4C-O--ZRTcauPwdwwKo-I7GkIfDhvbvN9IIRUKJU5dlQAAAAH62YR3AA"
 
-app = Client("my_userbot10", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
+app = Client("my_userbot11", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
 async def process_reaction_list(client: Client, message: Message):
     """Fungsi helper untuk memproses dan mengambil daftar username serta total react"""
