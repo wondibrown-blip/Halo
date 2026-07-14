@@ -7,7 +7,7 @@ from pyrogram.raw.types import InputPeerChannel, InputPeerChat
 # ==================== CONFIGURATION ====================
 API_ID = 32500857         
 API_HASH = "777a8c5d7b009d027a2d3b64b67652f1"  
-SESSION_STRING = "BQHv7HkABfcNqruKJmIqHXxLaI_b5OXfnjp6xLx43mZXc9Jc-0f_oVCEAL5_xIzHrfP1dx-EQhu3vVWeVwKJhOeAZKOMHz1YRmub0HNTyfwKP034CMZjdGgmtQrVDS_bXLGv5JqARuXlpu2Tpx1UX-qNxtHY1WXU1pCzpKhQNxrWeyEwSKRNbdwfr7APjpZvwv058cS7sVJGbhhp5HHQXjoGE67Y6LuElYtRMg4Je28m3rkj2rHReVtZ1L1pso5kH7ZJoCq6MEFZxxxzMs_W0OUktEEBXP_NXy356DPxYf8yPEYjGH4C-O--ZRTcauPwdwwKo-I7GkIfDhvbvN9IIRUKJU5dlQAAAAH62YR3AA"
+SESSION_STRING = "BQHv7HkAdUsbSGBOokXtih-kpCUxfjRrjbHaPK8UCepJzQIhvqFPSbzzavkecEd5PyFc-LNyAgeWaGh7_kHZz3U6GzLEk29Bex-AR21jE-qQ-OfQjDzvcPa5WWYyLccPF4GUfxTs-yArztALQE7CEpuah2UjdIHadgrzj5fbPxuoCixb_oub2VUdronPn3UK_qeXOrRjh7SxEpUDc4GSGHB9NipiFHp4Q8MJdTpnFUIA2xOUZFxXfBCvx7R37lN-pjIXOw9g1OVm4jmBA37evYG1CeBXoPCR2THx8vjnFfdsC9ArAS3MR3DXB8yidUv02UoGO2PY4Trm0TEkcsMxJAUMoZ8vTAAAAAH62YR3AA"
 
 app = Client("my_userbot11", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
