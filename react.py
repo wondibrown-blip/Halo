@@ -12,33 +12,31 @@ SESSION_STRING = "BQHv7HkAdUsbSGBOokXtih-kpCUxfjRrjbHaPK8UCepJzQIhvqFPSbzzavkecE
 app = Client("my_userbot11", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
 async def process_reaction_list(client: Client, message: Message):
-    """Fungsi helper untuk memproses dan mengambil daftar username serta total react"""
+    """Fungsi helper yang aman dari crash thread untuk mengambil list user & total react"""
     target_msg = message.reply_to_message
     user_list = []
     total_react_count = 0
 
+    # 1. Ambil pesan terbaru & hitung reaksinya secara aman
     try:
-        # 1. Ambil hitungan total reaksi aktual dari pesan
         updated_msg = await client.get_messages(chat_id=message.chat.id, message_ids=target_msg.id)
-        if updated_msg.reactions and updated_msg.reactions.reactions:
-            for r in updated_msg.reactions.reactions:
-                total_react_count += r.count
+        if updated_msg and updated_msg.reactions:
+            if hasattr(updated_msg.reactions, "reactions") and updated_msg.reactions.reactions:
+                for r in updated_msg.reactions.reactions:
+                    total_react_count += getattr(r, "count", 0)
+            elif isinstance(updated_msg.reactions, list):
+                for r in updated_msg.reactions:
+                    total_react_count += getattr(r, "count", 0)
+            else:
+                total_react_count = getattr(updated_msg.reactions, "count", 0)
+    except Exception as e:
+        print(f"[Log] Gagal mengambil total reaksi: {str(e)}")
 
-        # 2. Penanganan Khusus Supergroup/Channel-Chat (Bypass MSG_ID_INVALID)
-        if message.chat.type in ["supergroup", "channel"]:
-            channel_id = int(str(message.chat.id).replace("-100", ""))
-            chat_info = await client.get_chat(message.chat.id)
-            access_hash = chat_info.linked_chat.access_hash if getattr(chat_info, "linked_chat", None) else 0
-            
-            if not access_hash:
-                resolved_peer = await client.resolve_peer(message.chat.id)
-                access_hash = getattr(resolved_peer, "access_hash", 0)
-                
-            chat_peer = InputPeerChannel(channel_id=channel_id, access_hash=access_hash)
-        else:
-            chat_peer = await client.resolve_peer(message.chat.id)
+    # 2. Ambil daftar user menggunakan API Telegram secara dinamis
+    try:
+        # Gunakan client.resolve_peer secara aman
+        chat_peer = await client.resolve_peer(message.chat.id)
         
-        # 3. Ambil daftar user dari database Telegram
         raw_reply = await client.invoke(
             functions.messages.GetMessageReactionsList(
                 peer=chat_peer,
@@ -46,28 +44,27 @@ async def process_reaction_list(client: Client, message: Message):
                 limit=100
             )
         )
-        
-        # 4. Ekstrak data username
-        if hasattr(raw_reply, "users"):
+
+        if raw_reply and hasattr(raw_reply, "users"):
             for raw_user in raw_reply.users:
-                username = None
-                if getattr(raw_user, "username", None):
-                    username = raw_user.username
-                elif getattr(raw_user, "usernames", None):
+                username = getattr(raw_user, "username", None)
+                if not username and getattr(raw_user, "usernames", None):
                     for u in raw_user.usernames:
-                        if getattr(u, "active", False) or getattr(u, "editable", False):
+                        if getattr(u, "active", False):
                             username = u.username
                             break
-                
                 if username:
                     user_list.append(f"@{username}")
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"[Log] Gagal mengambil daftar user: {str(e)}")
 
+    # 3. Validasi & Hitung Cadangan (mencegah angka 0 jika data user terbaca)
     user_list = list(set(user_list))
+    if total_react_count == 0 and len(user_list) > 0:
+        total_react_count = len(user_list)
+
     usernames_string = "No-Users-Detected" if not user_list else " ".join(user_list)
-    
     return usernames_string, total_react_count
 
 
