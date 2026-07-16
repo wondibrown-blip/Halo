@@ -1,10 +1,10 @@
 import asyncio
-from pyrogram import Client, filters
+from pyrogram import Client, filters, idle
 from pyrogram.types import Message
 from pyrogram.raw import functions
-from pyrogram.raw.types import InputPeerChannel, InputPeerChat
 
 # ==================== CONFIGURATION ====================
+# ⚠️ WARNING: Revoke this session in your Telegram settings ASAP, as it is exposed!
 API_ID = 34004937         
 API_HASH = "804cec5c31b7cd051030833989b71f72"  
 SESSION_STRING = "BQIG38kASVFcay-u6HS8j-tc49b7D-bRhp2PaezMH1pBgFzkb-HQed79D088PRi3QPv8C4H7AzDKhhkyK-6hc_iMo7OjPVc4nVuJs-HBP5_OxIHdZwBTOPkanpWZpZ-VLGUBEHJyHNV-zJwiolmYJ-J4Amo0Ldv540Tg-dbBYopqD8JZyzrEc1_vVj_nd9TbdBv2gEsjIf8H7PBTc6N-DNXbK809ZtJhCcl36KBPOvvs5TVlrxkD-qCYzf-gyqhqFis2XfUMQcYuthUiJ24rVVtWyjfE65ECU4iniZ5uhK9pMx09PicMXstr44u3vmSySuS-HySga5Y9aKvRcH2X-uy0h-7JOgAAAAH62YR3AA"
@@ -12,7 +12,7 @@ SESSION_STRING = "BQIG38kASVFcay-u6HS8j-tc49b7D-bRhp2PaezMH1pBgFzkb-HQed79D088PR
 app = Client("my_userbot11", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
 async def process_reaction_list(client: Client, message: Message):
-    """Fungsi helper yang aman dari crash thread untuk mengambil list user & total react"""
+    """Fungsi helper untuk mengambil list user & total react"""
     target_msg = message.reply_to_message
     user_list = []
     total_react_count = 0
@@ -34,7 +34,6 @@ async def process_reaction_list(client: Client, message: Message):
 
     # 2. Ambil daftar user menggunakan API Telegram secara dinamis
     try:
-        # Gunakan client.resolve_peer secara aman
         chat_peer = await client.resolve_peer(message.chat.id)
         
         raw_reply = await client.invoke(
@@ -59,7 +58,7 @@ async def process_reaction_list(client: Client, message: Message):
     except Exception as e:
         print(f"[Log] Gagal mengambil daftar user: {str(e)}")
 
-    # 3. Validasi & Hitung Cadangan (mencegah angka 0 jika data user terbaca)
+    # 3. Validasi & Hitung Cadangan
     user_list = list(set(user_list))
     if total_react_count == 0 and len(user_list) > 0:
         total_react_count = len(user_list)
@@ -79,7 +78,7 @@ async def cmd_done(client: Client, message: Message):
     usernames_string, total_react_count = await process_reaction_list(client, message)
     caption_template = f"`{usernames_string} ({total_react_count})`"
     
-    await message.reply_text(text=caption_template, disable_web_page_preview=False)
+    await message.reply_text(text=caption_template)
 
 
 @app.on_message(filters.command("doni", prefixes=["/", "."]) & filters.group)
@@ -90,7 +89,6 @@ async def cmd_doni(client: Client, message: Message):
 
     usernames_string, total_react_count = await process_reaction_list(client, message)
     
-    # Template Estetik SYNC PACT sesuai permintaan
     caption_template = (
         "``` \n"
         "ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ\n"
@@ -102,19 +100,15 @@ async def cmd_doni(client: Client, message: Message):
     await message.reply_text(text=caption_template, disable_web_page_preview=False)
 
 
-# Menjalankan bot secara non-blocking asinkron agar aman dari thread crash
+# ==================== RUNNER ====================
 async def main():
-    # Mengatasi AUTH_KEY_DUPLICATED: Memberi jeda 6 detik saat kontainer restart 
-    # agar koneksi lama benar-benar diputus total oleh Railway sebelum membuat koneksi baru.
     print("⏳ Menunggu stabilitas alokasi jaringan (6 detik)...")
     await asyncio.sleep(6)
     
     async with app:
-        print("⚡ Userbot /amey & /amer AKTIF & STABIL 24/7 di Railway!")
-        # loop asinkron murni agar runtime tidak menyentuh bentrokan threading internal
-        while True:
-            await asyncio.sleep(3600)
+        print("⚡ Userbot /done & /doni AKTIF & STABIL 24/7 di Railway!")
+        # Menggunakan idle() bawaan pyrogram agar background task berjalan lancar tanpa terputus loop manual
+        await idle()
 
 if __name__ == "__main__":
-    # Menggunakan event loop bawaan yang aman untuk Python 3.10+
     asyncio.run(main())
