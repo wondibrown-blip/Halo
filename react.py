@@ -102,5 +102,20 @@ async def cmd_doni(client: Client, message: Message):
     await message.reply_text(text=caption_template, disable_web_page_preview=False)
 
 
-print("⚡ Userbot /done & /doni v10 Aktif!")
-app.run()
+# Menjalankan bot secara non-blocking asinkron agar aman dari thread crash
+async def start_bot():
+    # Berikan jeda 5 detik saat start untuk memastikan sesi lama di platform 
+    # benar-benar dilepas/dimatikan sebelum sesi baru melakukan handshake ke Telegram.
+    print("⏳ Menunggu stabilitas network (5 detik)...")
+    await asyncio.sleep(5)
+    
+    await app.start()
+    print("⚡ Userbot /amey & /amer v11 Aktif Stabil di Railway!")
+    
+    # Menjaga bot tetap hidup tanpa menggunakan app.run() yang memicu loop-crash
+    while True:
+        await asyncio.sleep(3600)
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(start_bot())
