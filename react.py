@@ -83,8 +83,14 @@ async def process_reaction_list(client: Client, message: Message):
 
 
 # ==================== COMMANDS ====================
+# ==================== COMMANDS ====================
 
-# Menangkap semua tipe grup (Supergroup/Channel/Grup Biasa) khusus dari akun kamu sendiri
+# Pemicu DEBUG: Mencetak setiap pesan yang kamu kirim di Telegram ke log Railway
+@app.on_message(filters.me)
+async def debug_logger(client: Client, message: Message):
+    print(f"[DEBUG LOG] Kamu mengetik sesuatu: {message.text}")
+
+# Perintah utama kamu tetap di bawah ini
 GROUP_FILTERS = filters.me & (filters.group | filters.channel)
 
 @app.on_message(filters.command("done", prefixes=["/", "."]) & GROUP_FILTERS)
