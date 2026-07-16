@@ -18,6 +18,7 @@ app = Client(
     api_hash=API_HASH, 
     session_string=SESSION_STRING,
     in_memory=True,
+    workers=8
     max_concurrent_transmissions=3
 )
 
