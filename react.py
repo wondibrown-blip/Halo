@@ -7,7 +7,7 @@ from pyrogram.errors import FloodWait, RPCError
 # ==================== CONFIGURATION ====================
 API_ID = 34004937         
 API_HASH = "804cec5c31b7cd051030833989b71f72"  
-SESSION_STRING = "BQIG38kASVFcay-u6HS8j-tc49b7D-bRhp2PaezMH1pBgFzkb-HQed79D088PRi3QPv8C4H7AzDKhhkyK-6hc_iMo7OjPVc4nVuJs-HBP5_OxIHdZwBTOPkanpWZpZ-VLGUBEHJyHNV-zJwiolmYJ-J4Amo0Ldv540Tg-dbBYopqD8JZyzrEc1_vVj_nd9TbdBv2gEsjIf8H7PBTc6N-DNXbK809ZtJhCcl36KBPOvvs5TVlrxkD-qCYzf-gyqhqFis2XfUMQcYuthUiJ24rVVtWyjfE65ECU4iniZ5uhK9pMx09PicMXstr44u3vmSySuS-HySga5Y9aKvRcH2X-uy0h-7JOgAAAAH62YR3AA"
+SESSION_STRING = "BQIG38kAgvWExx7Y_lvUUlsGp05lxhClChKvrVvkyhh64xVhZrwjzNOzQ7CKn1amIxcLZW2iRyiIyUxW-h4qCPp40RdobU3cVQhBLthkOej9xKOOG2vsvTK1hk-TmFHPQmXoKW7JztTz2bMNeoyz67o6fTt5OD77se-kUpIq_omWiuj3t-0dT_FZ6hS12OpuIKu4rpgNBbWvbiI6CZi0S5_YUw1QOwlbT86GkD8-8cFbtcJuBvb_Nw5e0_2TVrwdRytiCj6gK5ydTXRqh-qZ-p5Vsju2nmcuiD8cwfWq8gh_39bTrUjHepHyjK8Na4mCzbQCDj-BFgkuSfYRU2-erWFAN-uJVAAAAAH62YR3AA"
 
 app = Client(
     "my_userbot11", 
