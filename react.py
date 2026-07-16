@@ -5,8 +5,8 @@ from pyrogram.raw import functions
 from pyrogram.raw.types import InputPeerChannel, InputPeerChat
 
 # ==================== CONFIGURATION ====================
-API_ID = 32500857         
-API_HASH = "777a8c5d7b009d027a2d3b64b67652f1"  
+API_ID = 34004937         
+API_HASH = "804cec5c31b7cd051030833989b71f72"  
 SESSION_STRING = "BQHv7HkAdUsbSGBOokXtih-kpCUxfjRrjbHaPK8UCepJzQIhvqFPSbzzavkecEd5PyFc-LNyAgeWaGh7_kHZz3U6GzLEk29Bex-AR21jE-qQ-OfQjDzvcPa5WWYyLccPF4GUfxTs-yArztALQE7CEpuah2UjdIHadgrzj5fbPxuoCixb_oub2VUdronPn3UK_qeXOrRjh7SxEpUDc4GSGHB9NipiFHp4Q8MJdTpnFUIA2xOUZFxXfBCvx7R37lN-pjIXOw9g1OVm4jmBA37evYG1CeBXoPCR2THx8vjnFfdsC9ArAS3MR3DXB8yidUv02UoGO2PY4Trm0TEkcsMxJAUMoZ8vTAAAAAH62YR3AA"
 
 app = Client("my_userbot11", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
@@ -103,19 +103,18 @@ async def cmd_doni(client: Client, message: Message):
 
 
 # Menjalankan bot secara non-blocking asinkron agar aman dari thread crash
-async def start_bot():
-    # Berikan jeda 5 detik saat start untuk memastikan sesi lama di platform 
-    # benar-benar dilepas/dimatikan sebelum sesi baru melakukan handshake ke Telegram.
-    print("⏳ Menunggu stabilitas network (5 detik)...")
-    await asyncio.sleep(5)
+async def main():
+    # Mengatasi AUTH_KEY_DUPLICATED: Memberi jeda 6 detik saat kontainer restart 
+    # agar koneksi lama benar-benar diputus total oleh Railway sebelum membuat koneksi baru.
+    print("⏳ Menunggu stabilitas alokasi jaringan (6 detik)...")
+    await asyncio.sleep(6)
     
-    await app.start()
-    print("⚡ Userbot /amey & /amer v11 Aktif Stabil di Railway!")
-    
-    # Menjaga bot tetap hidup tanpa menggunakan app.run() yang memicu loop-crash
-    while True:
-        await asyncio.sleep(3600)
+    async with app:
+        print("⚡ Userbot /amey & /amer AKTIF & STABIL 24/7 di Railway!")
+        # loop asinkron murni agar runtime tidak menyentuh bentrokan threading internal
+        while True:
+            await asyncio.sleep(3600)
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(start_bot())
+    # Menggunakan event loop bawaan yang aman untuk Python 3.10+
+    asyncio.run(main())
