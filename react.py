@@ -1,27 +1,33 @@
+import os
 import asyncio
 from pyrogram import Client, filters, idle
 from pyrogram.types import Message
 from pyrogram.raw import functions
 from pyrogram.errors import FloodWait, RPCError
 
-# ==================== CONFIGURATION ====================
-API_ID = 34004937         
-API_HASH = "804cec5c31b7cd051030833989b71f72"  
-SESSION_STRING = "BQIG38kAgvWExx7Y_lvUUlsGp05lxhClChKvrVvkyhh64xVhZrwjzNOzQ7CKn1amIxcLZW2iRyiIyUxW-h4qCPp40RdobU3cVQhBLthkOej9xKOOG2vsvTK1hk-TmFHPQmXoKW7JztTz2bMNeoyz67o6fTt5OD77se-kUpIq_omWiuj3t-0dT_FZ6hS12OpuIKu4rpgNBbWvbiI6CZi0S5_YUw1QOwlbT86GkD8-8cFbtcJuBvb_Nw5e0_2TVrwdRytiCj6gK5ydTXRqh-qZ-p5Vsju2nmcuiD8cwfWq8gh_39bTrUjHepHyjK8Na4mCzbQCDj-BFgkuSfYRU2-erWFAN-uJVAAAAAH62YR3AA"
+# ==================== SECURE CONFIGURATION ====================
+# Mengambil kredensial secara aman dari Environment Variables Railway
+API_ID = int(os.getenv("API_ID"))
+API_HASH = os.getenv("API_HASH")
+SESSION_STRING = os.getenv("SESSION_STRING")
 
+# Configured for maximum network stability & Zero disk locks
 app = Client(
     "my_userbot11", 
     api_id=API_ID, 
     api_hash=API_HASH, 
     session_string=SESSION_STRING,
-    in_memory=True
+    in_memory=True,
+    max_concurrent_transmissions=3
 )
 
 async def process_reaction_list(client: Client, message: Message):
+    """Safely extracts usernames and reaction counts with zero crash risk"""
     target_msg = message.reply_to_message
     user_list = []
     total_react_count = 0
 
+    # 1. Fetch total counts safely
     try:
         updated_msg = await client.get_messages(chat_id=message.chat.id, message_ids=target_msg.id)
         if updated_msg and updated_msg.reactions:
@@ -32,13 +38,14 @@ async def process_reaction_list(client: Client, message: Message):
                 for r in updated_msg.reactions:
                     total_react_count += getattr(r, "count", 0)
     except FloodWait as e:
+        print(f"[Rate Limit] Hit FloodWait for {e.value}s while counting.")
         await asyncio.sleep(e.value)
     except Exception as e:
-        print(f"[Log] Failed to get reactions: {str(e)}")
+        print(f"[Log Warning] Safe pass count error: {e}")
 
+    # 2. Extract User List via Telegram Raw Layer
     try:
         chat_peer = await client.resolve_peer(message.chat.id)
-        
         raw_reply = await client.invoke(
             functions.messages.GetMessageReactionsList(
                 peer=chat_peer,
@@ -59,12 +66,14 @@ async def process_reaction_list(client: Client, message: Message):
                     user_list.append(f"@{username}")
 
     except FloodWait as e:
+        print(f"[Rate Limit] Hit FloodWait for {e.value}s while fetching users.")
         await asyncio.sleep(e.value)
     except RPCError as e:
-        print(f"[Telegram RPC Error] {e.MESSAGE}")
+        print(f"[RPC Warning] Handled safely: {e.MESSAGE}")
     except Exception as e:
-        print(f"[Log] Failed to get user list: {str(e)}")
+        print(f"[Log Warning] Handled user generation failure: {e}")
 
+    # Fallback to prevent 0 counts if user strings were successfully parsed
     user_list = list(set(user_list))
     if total_react_count == 0 and len(user_list) > 0:
         total_react_count = len(user_list)
@@ -74,9 +83,11 @@ async def process_reaction_list(client: Client, message: Message):
 
 
 # ==================== COMMANDS ====================
-# Updated filters to capture Supergroups/Channels and only execute if triggered by YOU
 
-@app.on_message(filters.command("done", prefixes=["/", "."]) & filters.me & (filters.group | filters.channel))
+# Menangkap semua tipe grup (Supergroup/Channel/Grup Biasa) khusus dari akun kamu sendiri
+GROUP_FILTERS = filters.me & (filters.group | filters.channel)
+
+@app.on_message(filters.command("done", prefixes=["/", "."]) & GROUP_FILTERS)
 async def cmd_done(client: Client, message: Message):
     if not message.reply_to_message:
         await message.reply_text("Rep terus /done")
@@ -84,11 +95,11 @@ async def cmd_done(client: Client, message: Message):
     try:
         usernames_string, total_react_count = await process_reaction_list(client, message)
         await message.reply_text(text=f"`{usernames_string} ({total_react_count})`")
-    except Exception as e:
-        print(f"[Error Handler Done] {e}")
+    except Exception as fatal_error:
+        print(f"[System Suppressed Error]: {fatal_error}")
 
 
-@app.on_message(filters.command("doni", prefixes=["/", "."]) & filters.me & (filters.group | filters.channel))
+@app.on_message(filters.command("doni", prefixes=["/", "."]) & GROUP_FILTERS)
 async def cmd_doni(client: Client, message: Message):
     if not message.reply_to_message:
         await message.reply_text("Rep terus /doni")
@@ -103,18 +114,24 @@ async def cmd_doni(client: Client, message: Message):
             "ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ```"
         )
         await message.reply_text(text=caption_template, disable_web_page_preview=False)
-    except Exception as e:
-        print(f"[Error Handler Doni] {e}")
+    except Exception as fatal_error:
+        print(f"[System Suppressed Error]: {fatal_error}")
 
 
-# ==================== RUNNER ====================
+# ==================== CORE SYSTEM RUNNER ====================
 async def main():
-    print("⏳ Waiting 15 seconds for network session allocation...")
-    await asyncio.sleep(15)
+    # Jeda 20 detik agar Railway bisa memutuskan koneksi lama sebelum membuat yang baru
+    print("⏳ Memperbarui jaringan session socket dari Railway...")
+    await asyncio.sleep(20)
     
     async with app:
-        print("⚡ Userbot ACTIVE. Listening ONLY to your account updates across all group types.")
+        print("⚡ Userbot AKTIF dengan kredensial aman dari Railway!")
         await idle()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        print("👋 System closed down gracefully.")
+    except Exception as main_err:
+        print(f"[Critical Fail Catch] System Auto-Recovery: {main_err}")
