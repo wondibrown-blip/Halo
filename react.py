@@ -135,3 +135,8 @@ if __name__ == "__main__":
         print("👋 System closed down gracefully.")
     except Exception as main_err:
         print(f"[Critical Fail Catch] System Auto-Recovery: {main_err}")
+
+
+@app.on_message(filters.command("tes", prefixes=["/", "."]) & filters.me)
+async def cmd_tes(client: Client, message: Message):
+    await message.reply_text("Bot aktif dan merespon!")
